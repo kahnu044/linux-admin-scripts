@@ -63,3 +63,28 @@ if [[ "$check_web_server" == "yes" ]]; then
 else
     echo "Web server check skipped."
 fi
+
+
+# Step 5: Add a new user
+echo "Step 5: Adding a new user"
+read -p "Do you want to add a new user? (yes/no): " add_user_choice
+
+if [[ "$add_user_choice" == "yes" ]]; then
+    read -p "Enter the username for the new user: " username
+
+    # Check if the username already exists
+    while id "$username" &>/dev/null; do
+        echo "Username '$username' already exists. Please choose a different username."
+        read -p "Enter a new username: " username
+    done
+
+    # Add the user
+    adduser $username
+
+    # Add the user to sudo group
+    usermod -aG sudo $username
+
+    echo "User '$username' successfully added."
+else
+    echo "User addition skipped."
+fi
