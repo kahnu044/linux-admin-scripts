@@ -78,13 +78,16 @@ if [[ "$add_user_choice" == "yes" ]]; then
         read -p "Enter a new username: " username
     done
 
-    # Add the user
-    adduser $username
+    # Add the user with sudo for administrative tasks
+    sudo adduser $username
 
     # Add the user to sudo group
-    usermod -aG sudo $username
+    sudo usermod -aG sudo $username
 
-    echo "User '$username' successfully added."
+    # Add the user to www-data group
+    sudo usermod -aG www-data $username
+
+    echo "User '$username' successfully added and added to 'sudo' and 'www-data' groups."
 else
     echo "User addition skipped."
 fi
