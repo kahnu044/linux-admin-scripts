@@ -139,6 +139,62 @@ if [[ "$create_project_choice" == "yes" ]]; then
         sudo chmod 755 /home/$username/$folder_name
 
         echo "Project folder '/home/$username/$folder_name' created for user '$username'."
+
+        # Step 7: Create a test project and Nginx configuration
+        echo "Step 7: Creating a test project and Nginx configuration"
+        read -p "Do you want to create a test project? (yes/no): " create_test_project
+
+        if [[ "$create_test_project" == "yes" ]]; then
+            # Create a new project folder
+            read -p "Enter the project name (default: project_test_1): " project_name
+            project_name=${project_name:-project_test_1}  # Set default to 'project_test_1' if empty
+
+            project_path="/home/$username/$folder_name/$project_name"
+            sudo -u $username mkdir -p $project_path
+
+            # Create an index.html file with "Hello World"
+            echo "Hello World" | sudo tee $project_path/index.html > /dev/null
+            sudo chown $username:$username $project_path/index.html
+
+            echo "Test project '$project_name' created with an index.html file."
+
+            # Ask for the domain name for the Nginx configuration
+            read -p "Enter the domain name for the Nginx configuration: " domain_name
+
+            # Create the Nginx configuration
+            nginx_config_path="/etc/nginx/sites-available/$domain_name"
+            sudo tee $nginx_config_path > /dev/null <<EOL
+server {
+    listen 80;
+    server_name $domain_name;
+
+    root $project_path;
+    index index.html;
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+}
+EOL
+
+            # Enable the site by creating a symlink to sites-enabled
+            sudo ln -s $nginx_config_path /etc/nginx/sites-enabled/
+
+            # Test the Nginx configuration for syntax errors
+            sudo nginx -t
+
+            # Reload Nginx to apply the new configuration
+            sudo systemctl reload nginx
+
+            # Show the domain name with the server IP and guide the user
+            server_ip=$(hostname -I | awk '{print $1}')
+            echo "The Nginx configuration for '$domain_name' has been created and enabled."
+            echo "Please add the following DNS record to your DNS server:"
+            echo "A record for '$domain_name' pointing to '$server_ip'."
+        else
+            echo "Test project and Nginx configuration creation skipped."
+        fi
+
     else
         echo "Project folder creation skipped."
     fi
