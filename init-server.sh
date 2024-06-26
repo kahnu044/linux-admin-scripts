@@ -91,3 +91,57 @@ if [[ "$add_user_choice" == "yes" ]]; then
 else
     echo "User addition skipped."
 fi
+
+# Step 6: Create project folder
+echo "Step 6: Creating project folder"
+read -p "Do you want to add a project folder? (yes/no): " create_project_choice
+
+if [[ "$create_project_choice" == "yes" ]]; then
+    # Prompt for project folder name or default to 'apps'
+    read -p "Enter the folder name for projects (default: apps): " folder_name
+    folder_name=${folder_name:-apps}  # Set default to 'apps' if empty
+
+    # If we already have the new user
+    if [[ "$add_user_choice" == "yes" ]]; then
+        echo "Adding project folder for - '$username' "
+    else
+        echo "Select the Existing user:"
+
+        # Get a list of existing users added manually by root
+        user_list=$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd)
+
+        select username in $user_list; do
+            if [[ -n "$username" ]]; then
+                break
+            else
+                echo "Invalid selection. Please choose a username from the list."
+            fi
+        done
+
+        # Check if a username was selected
+        if [[ -z "$username" ]]; then
+            echo "No username selected. Exiting."
+            exit 1
+        fi
+
+        echo "Selected username: $username"
+    fi
+
+    # Proceed to create project folder if username is set
+    if [[ -n "$username" ]]; then
+        # Create the project folder in user's home directory
+        sudo -u $username mkdir -p /home/$username/$folder_name
+
+        # Set ownership of the folder to the user
+        sudo chown -R $username:$username /home/$username/$folder_name
+
+        # Set permissions (example: 755 for directories)
+        sudo chmod 755 /home/$username/$folder_name
+
+        echo "Project folder '/home/$username/$folder_name' created for user '$username'."
+    else
+        echo "Project folder creation skipped."
+    fi
+else
+    echo "Project folder creation skipped."
+fi
