@@ -51,3 +51,15 @@ if [[ "$web_server_choice" == "yes" ]]; then
 else
     echo "Web server installation skipped."
 fi
+
+
+# Step 4: Check if web server is working
+echo "Step 4: Checking web server status"
+read -p "Do you want to check if the web server is working? (yes/no): " check_web_server
+
+if [[ "$check_web_server" == "yes" ]]; then
+    echo "Curling localhost to check web server status..."
+    curl -s http://localhost
+else
+    echo "Web server check skipped."
+fi
