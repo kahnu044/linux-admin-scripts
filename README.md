@@ -42,17 +42,10 @@ This repository contains a shell script to set up a Linux server with necessary 
 
 The script is designed to be modular. Here are the steps included:
 
-1. **Check for root privileges:**
-
-    ```bash
-    #!/bin/bash
-
-    if [[ $EUID -ne 0 ]]; then
-        echo "This script must be run as root"
-        exit 1
-    else
-        echo "Congratulations, you have root permissions! We are ready to go."
-    fi
-    ```
-
-    More steps will be added sequentially.
+1. **Check for root privileges**
+2. **System update**
+3. **Web server installation**
+4. **Checking web server status**
+5. **Adding a new user**
+6. **Creating project folder**
+7. **Creating a test project and Nginx configuration**
