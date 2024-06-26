@@ -21,3 +21,33 @@ if [[ "$update_choice" == "yes" ]]; then
 else
     echo "System update skipped."
 fi
+
+
+# Step 3: Ask user if they want to install a web server
+echo "Step 3: Web server installation"
+
+read -p "Do you want to install a web server? (yes/no): " web_server_choice
+
+if [[ "$web_server_choice" == "yes" ]]; then
+    echo "Choose a web server to install:"
+    echo "1. Nginx"
+    echo "2. Apache2"
+
+    read -p "Enter your choice (1 or 2): " server_choice
+
+    case $server_choice in
+        1)
+            echo "Installing Nginx..."
+            apt-get install -y nginx
+            ;;
+        2)
+            echo "Installing Apache2..."
+            apt-get install -y apache2
+            ;;
+        *)
+            echo "Invalid choice. Skipping web server installation."
+            ;;
+    esac
+else
+    echo "Web server installation skipped."
+fi
